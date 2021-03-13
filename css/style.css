@@ -522,6 +522,8 @@ button:hover {
     right: 10px;
     bottom: 25px;
     max-width: 50%;
+    /* hide on page load */
+    display: none;
   }
 
   .basic-info{
