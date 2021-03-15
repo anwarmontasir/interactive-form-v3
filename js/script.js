@@ -63,3 +63,22 @@ activities.addEventListener('change', e => {
     updateActivitiesPrice(activitiesTotalPrice);
 })
 
+updatePaymentInfo('credit-card');
+
+function updatePaymentInfo(paymentMethod) {
+    const paymentMethods = document.querySelector('.payment-methods').children;
+    for (let i=0; i<paymentMethods.length; i++) {
+        if(paymentMethods[i].id === paymentMethod) {
+            paymentMethods[i].style.display = 'block';
+        } else if (paymentMethods[i].id) {
+            paymentMethods[i].style.display = 'none';
+        }
+    }
+}
+
+const paymentMethodSelect = document.getElementById('payment');
+
+paymentMethodSelect.addEventListener('change', e => {
+    const paymentMethod = e.target.value;
+    updatePaymentInfo(paymentMethod);
+})
