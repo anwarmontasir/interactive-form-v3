@@ -61,23 +61,28 @@ function enableColor(designValue) {
     colorSelect.options[0].textContent = 'select T-shirt color';
 }
 
-let activitiesTotalPrice = 0;
-updateActivitiesPrice(activitiesTotalPrice);
-
-function updateActivitiesPrice(activitiesTotalPrice) {
-    const activitiesCost = document.getElementById('activities-cost');
-    activitiesCost.textContent = `Total: $${activitiesTotalPrice}`;
-}
-
 const activities = document.getElementById('activities');
+const activitiesBox = document.getElementById('activities-box');
+const activityItems = activitiesBox.children;
+let activitiesTotalPrice = 0;
+updateActivitiesPrice(activityItems);
 
 activities.addEventListener('change', e => {
-    const activityPrice = parseInt(e.target.getAttribute('data-cost'));
-    const addActivityPrice = e.target.checked ? activityPrice : -activityPrice;
-    activitiesTotalPrice += addActivityPrice;
-    updateActivitiesPrice(activitiesTotalPrice);
-    validateActivities();
-})
+    updateActivitiesPrice(activityItems);
+    validateActivities(activitiesBox, activitiesTotalPrice);
+});
+
+function updateActivitiesPrice(activityItems) {
+    activitiesTotalPrice = 0;
+    for (let i=0; i<activityItems.length; i++) {
+        if (activityItems[i].children[0].checked) {
+            const activityCost = parseInt(activityItems[i].children[0].getAttribute('data-cost'));
+            activitiesTotalPrice += activityCost;
+        };
+    }
+    const activityCostText = document.getElementById('activities-cost');
+    activityCostText.textContent = `Total: $${activitiesTotalPrice}`;
+}
 
 let paymentMethod = 'credit-card';
 updatePaymentInfo(paymentMethod);
@@ -122,15 +127,16 @@ const form = document.querySelector('form');
 
 form.addEventListener('submit', e => {
     formHasErrors = false;
-    validateNameField(nameField.value);
-    validateEmailField(emailField.value);
-    validateActivities();
+    validateNameField(nameField, nameField.value);
+    validateEmailField(emailField, emailField.value);
+    validateActivities(activitiesBox, activitiesTotalPrice);
     if (paymentMethod === 'credit-card') {
         validateCCNum(ccNum, ccNum.value);
         validateZip(zip, zip.value);
         validateCVV(cvv, cvv.value);
     }
     if (formHasErrors) {
+        e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 })
@@ -168,13 +174,12 @@ function isValidEmail(value) {
     return /^[^@]+@[^@.]+\.[a-z]+$/i.test(value);
 }
 
-function validateActivities() {
-    const activitiesField = document.getElementById('activities-box');
-    const activitiesHint = document.getElementById('activities-hint');
-    if (activitiesTotalPrice === 0) {
-        showError(activitiesField, activitiesHint);
+function validateActivities(field, value) {
+    const hint = document.getElementById('activities-hint');
+    if (value === 0) {
+        showError(field, hint);
     } else {
-        hideError(activitiesField, activitiesHint);
+        hideError(field, hint);
     }
 }
 
