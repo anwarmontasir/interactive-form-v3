@@ -45,3 +45,21 @@ function enableColor(designValue) {
     colorSelect.selectedIndex = 0;
     colorSelect.options[0].textContent = 'select T-shirt color';
 }
+
+let activitiesTotalPrice = 0;
+updateActivitiesPrice(activitiesTotalPrice);
+
+function updateActivitiesPrice(activitiesTotalPrice) {
+    const activitiesCost = document.getElementById('activities-cost');
+    activitiesCost.textContent = `Total: $${activitiesTotalPrice}`;
+}
+
+const activities = document.getElementById('activities');
+
+activities.addEventListener('change', e => {
+    const activityPrice = parseInt(e.target.getAttribute('data-cost'));
+    const addActivityPrice = e.target.checked ? activityPrice : -activityPrice;
+    activitiesTotalPrice += addActivityPrice;
+    updateActivitiesPrice(activitiesTotalPrice);
+})
+
