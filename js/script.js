@@ -1,3 +1,4 @@
+/* boolean to test if form is valid */
 let formHasErrors = false;
 
 const nameField = document.getElementById('name');
@@ -9,13 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 nameField.addEventListener('blur', e => {
-    validateNameField(e.target.value);
+    validateNameField(nameField, e.target.value);
 })
 
 const emailField = document.getElementById('email');
 
 emailField.addEventListener('blur', e => {
-    validateEmailField(e.target.value);
+    validateEmailField(emailField, e.target.value);
 })
 
 /* when title is selected, show/hide #other-job-role */
@@ -78,7 +79,8 @@ activities.addEventListener('change', e => {
     validateActivities();
 })
 
-updatePaymentInfo('credit-card');
+let paymentMethod = 'credit-card';
+updatePaymentInfo(paymentMethod);
 
 function updatePaymentInfo(paymentMethod) {
     const paymentMethods = document.querySelector('.payment-methods').children;
@@ -94,18 +96,40 @@ function updatePaymentInfo(paymentMethod) {
 const paymentMethodSelect = document.getElementById('payment');
 
 paymentMethodSelect.addEventListener('change', e => {
-    const paymentMethod = e.target.value;
+    paymentMethod = e.target.value;
     updatePaymentInfo(paymentMethod);
+})
+
+const ccNum = document.getElementById('cc-num');
+
+ccNum.addEventListener('blur', e => {
+    validateCCNum(ccNum, e.target.value);
+})
+
+const zip = document.getElementById('zip');
+
+zip.addEventListener('blur', e => {
+    validateZip(zip, e.target.value);
+})
+
+const cvv = document.getElementById('cvv');
+
+cvv.addEventListener('blur', e => {
+    validateCVV(cvv, e.target.value);
 })
 
 const form = document.querySelector('form');
 
 form.addEventListener('submit', e => {
-    e.preventDefault();
     formHasErrors = false;
     validateNameField(nameField.value);
     validateEmailField(emailField.value);
     validateActivities();
+    if (paymentMethod === 'credit-card') {
+        validateCCNum(ccNum, ccNum.value);
+        validateZip(zip, zip.value);
+        validateCVV(cvv, cvv.value);
+    }
     if (formHasErrors) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -122,26 +146,26 @@ function hideError(field, hint) {
     field.style.border = '1px solid rgba(36, 28, 21, 0.2)';
 }
 
-function validateNameField(nameFieldValue) {
-    const nameHint = document.getElementById('name-hint');
-    if (nameFieldValue.length === 0) {
-        showError(nameField, nameHint); 
+function validateNameField(field, value) {
+    const hint = document.getElementById('name-hint');
+    if (value.length === 0) {
+        showError(field, hint); 
     } else {
-        hideError(nameField, nameHint);
+        hideError(field, hint);
     }
 }
 
-function validateEmailField(emailFieldValue) {
-    const emailHint = document.getElementById('email-hint');
-    if (!isValidEmail(emailFieldValue)) {
-        showError(emailField, emailHint); 
+function validateEmailField(field, value) {
+    const hint = document.getElementById('email-hint');
+    if (!isValidEmail(value)) {
+        showError(field, hint); 
     } else {
-        hideError(emailField, emailHint);
+        hideError(field, hint);
     }
 }
 
-function isValidEmail(emailFieldValue) {
-    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailFieldValue);
+function isValidEmail(value) {
+    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(value);
 }
 
 function validateActivities() {
@@ -152,4 +176,43 @@ function validateActivities() {
     } else {
         hideError(activitiesField, activitiesHint);
     }
+}
+
+function validateCCNum(field, value) {
+    const hint = document.getElementById('cc-hint');
+    if(!isValidCCNum(value)) {
+        showError(field, hint);
+    } else {
+        hideError(field, hint);
+    }
+}
+
+function isValidCCNum(value) {
+    return /^[0-9]{13,16}$/.test(value);
+}
+
+function validateZip(field, value) {
+    const hint = document.getElementById('zip-hint');
+    if(!isValidZip(value)) {
+        showError(field, hint);
+    } else {
+        hideError(field, hint);
+    }
+}
+
+function isValidZip(value) {
+    return /^[0-9]{5}$/.test(value);
+}
+
+function validateCVV(field, value) {
+    const hint = document.getElementById('cvv-hint');
+    if(!isValidCVV(value)) {
+        showError(field, hint);
+    } else {
+        hideError(field, hint);
+    }
+}
+
+function isValidCVV(value) {
+    return /^[0-9]{5}$/.test(value);
 }
