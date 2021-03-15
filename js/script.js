@@ -1,8 +1,22 @@
+let formHasErrors = false;
+
+const nameField = document.getElementById('name');
+
 /* test for DOM load */
 document.addEventListener('DOMContentLoaded', () => {
     /* add focus */
-    document.getElementById('name').focus();
+    nameField.focus();
 });
+
+nameField.addEventListener('blur', e => {
+    validateNameField(e.target.value);
+})
+
+const emailField = document.getElementById('email');
+
+emailField.addEventListener('blur', e => {
+    validateEmailField(e.target.value);
+})
 
 /* when title is selected, show/hide #other-job-role */
 const titleSelect = document.getElementById('title');
@@ -82,3 +96,49 @@ paymentMethodSelect.addEventListener('change', e => {
     const paymentMethod = e.target.value;
     updatePaymentInfo(paymentMethod);
 })
+
+const form = document.querySelector('form');
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    formHasErrors = false;
+    validateNameField(nameField.value);
+    validateEmailField(emailField.value);
+    if (formHasErrors) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+})
+
+function showError(field, hint) {
+    hint.style.display = 'block';
+    field.style.border = '1px solid red';
+    formHasErrors = true;
+}
+
+function hideError(field, hint) {
+    hint.style.display = 'none';
+    field.style.border = '1px solid rgba(36, 28, 21, 0.2)';
+}
+
+function validateNameField(nameFieldValue) {
+    const nameHint = document.getElementById('name-hint');
+    if (nameFieldValue.length === 0) {
+        showError(nameField, nameHint); 
+    } else {
+        hideError(nameField, nameHint);
+    }
+}
+
+function validateEmailField(emailFieldValue) {
+    const emailHint = document.getElementById('email-hint');
+    console.log(isValidEmail(emailFieldValue));
+    if (!isValidEmail(emailFieldValue)) {
+        showError(emailField, emailHint); 
+    } else {
+        hideError(emailField, emailHint);
+    }
+}
+
+function isValidEmail(emailFieldValue) {
+    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailFieldValue);
+}
