@@ -75,6 +75,7 @@ activities.addEventListener('change', e => {
     const addActivityPrice = e.target.checked ? activityPrice : -activityPrice;
     activitiesTotalPrice += addActivityPrice;
     updateActivitiesPrice(activitiesTotalPrice);
+    validateActivities();
 })
 
 updatePaymentInfo('credit-card');
@@ -104,6 +105,7 @@ form.addEventListener('submit', e => {
     formHasErrors = false;
     validateNameField(nameField.value);
     validateEmailField(emailField.value);
+    validateActivities();
     if (formHasErrors) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -131,7 +133,6 @@ function validateNameField(nameFieldValue) {
 
 function validateEmailField(emailFieldValue) {
     const emailHint = document.getElementById('email-hint');
-    console.log(isValidEmail(emailFieldValue));
     if (!isValidEmail(emailFieldValue)) {
         showError(emailField, emailHint); 
     } else {
@@ -141,4 +142,14 @@ function validateEmailField(emailFieldValue) {
 
 function isValidEmail(emailFieldValue) {
     return /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailFieldValue);
+}
+
+function validateActivities() {
+    const activitiesField = document.getElementById('activities-box');
+    const activitiesHint = document.getElementById('activities-hint');
+    if (activitiesTotalPrice === 0) {
+        showError(activitiesField, activitiesHint);
+    } else {
+        hideError(activitiesField, activitiesHint);
+    }
 }
