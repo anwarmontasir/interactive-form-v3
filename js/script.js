@@ -163,11 +163,19 @@ function validateNameField(field, value) {
 
 function validateEmailField(field, value) {
     const hint = document.getElementById('email-hint');
-    if (!isValidEmail(value)) {
+    if (value.length === 0) {
+        updateEmailHint('Email field cannot be blank', hint);
+        showError(field, hint); 
+    } else if (!isValidEmail(value)) {
+        updateEmailHint('Email address must be formatted correctly', hint);
         showError(field, hint); 
     } else {
         hideError(field, hint);
     }
+}
+
+function updateEmailHint(msg, hint) {
+    hint.textContent = msg;
 }
 
 function isValidEmail(value) {
