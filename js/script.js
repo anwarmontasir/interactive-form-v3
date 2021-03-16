@@ -68,15 +68,28 @@ let activitiesTotalPrice = 0;
 updateActivitiesPrice(activityItems);
 
 activities.addEventListener('change', e => {
-    checkActivityTimes(e.target);
+    checkActivityTimes(activityItems, e.target);
     updateActivitiesPrice(activityItems);
     validateActivities(activitiesBox, activitiesTotalPrice);
 });
 
-function checkActivityTimes(checkBox) {
-    // console.log(checkBox.checked);
+function checkActivityTimes(activityItems, checkBox) {
+    /* is the current activity checked? Boolean */
+    const checkedStatus = checkBox.checked;
+    /* current activity time, such as Tuesday 9am-12pm */
     const activityTime = checkBox.parentElement.children[2].innerHTML;
-    // console.log(activityTime);
+    /* loop through activities */
+    for (let i=0; i<activityItems.length; i++) {
+        /* remove disabled class */
+        activityItems[i].classList.remove('disabled');
+        const eachActivityTime = activityItems[i].children[2].innerHTML;
+        /* if the current activity is checked (true) 
+           and a matching unchecked activity is found */ 
+        if (checkedStatus && eachActivityTime === activityTime && !activityItems[i].children[0].checked) {
+            /* add disabled class */
+            activityItems[i].classList.add('disabled');
+        }
+    }
 }
 
 function updateActivitiesPrice(activityItems) {
