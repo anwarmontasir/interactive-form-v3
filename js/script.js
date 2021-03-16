@@ -68,9 +68,16 @@ let activitiesTotalPrice = 0;
 updateActivitiesPrice(activityItems);
 
 activities.addEventListener('change', e => {
+    checkActivityTimes(e.target);
     updateActivitiesPrice(activityItems);
     validateActivities(activitiesBox, activitiesTotalPrice);
 });
+
+function checkActivityTimes(checkBox) {
+    // console.log(checkBox.checked);
+    const activityTime = checkBox.parentElement.children[2].innerHTML;
+    // console.log(activityTime);
+}
 
 function updateActivitiesPrice(activityItems) {
     activitiesTotalPrice = 0;
