@@ -9,19 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
     nameField.focus();
 });
 
+/* validate name field on blur */
 nameField.addEventListener('blur', e => {
     validateNameField(nameField, e.target.value);
 })
 
 const emailField = document.getElementById('email');
 
+/* validate email field on blur */
 emailField.addEventListener('blur', e => {
     validateEmailField(emailField, e.target.value);
 })
 
-/* when title is selected, show/hide #other-job-role */
 const titleSelect = document.getElementById('title');
 
+/* when title is changed, show/hide #other-job-role */
 titleSelect.addEventListener('change', e => {
     const titleValue = e.target.value;
     updateTitleField(titleValue)
@@ -36,10 +38,10 @@ function updateTitleField(titleValue) {
     }
 }
 
-/* when design is selected, enable color dropdown */
 const designSelect = document.getElementById('design');
 const colorSelect = document.getElementById('color');
 
+/* when design is selected, enable color dropdown */
 designSelect.addEventListener('change', e => {
     const designValue = e.target.value;
     enableColor(designValue)
@@ -65,33 +67,54 @@ const activities = document.getElementById('activities');
 const activitiesBox = document.getElementById('activities-box');
 const activityItems = activitiesBox.children;
 let activitiesTotalPrice = 0;
+
+/* check times, update total activities price based on what's checked */
+checkActivityTimes(activityItems);
 updateActivitiesPrice(activityItems);
 
+/* when an activity gets checked/unchecked
+   – disable/enable any events at the same time
+   - update total activities price
+   - validate (are none selected?) */
 activities.addEventListener('change', e => {
-    checkActivityTimes(activityItems, e.target);
+    checkActivityTimes(activityItems);
     updateActivitiesPrice(activityItems);
     validateActivities(activitiesBox, activitiesTotalPrice);
 });
 
-function checkActivityTimes(activityItems, checkBox) {
-    /* is the current activity checked? Boolean */
-    const checkedStatus = checkBox.checked;
-    /* current activity time, such as Tuesday 9am-12pm */
-    const activityTime = checkBox.parentElement.children[2].innerHTML;
-    /* loop through activities */
-    for (let i=0; i<activityItems.length; i++) {
-        /* remove disabled class */
-        activityItems[i].classList.remove('disabled');
-        const eachActivityTime = activityItems[i].children[2].innerHTML;
-        /* if the current activity is checked (true) 
-           and a matching unchecked activity is found */ 
-        if (checkedStatus && eachActivityTime === activityTime && !activityItems[i].children[0].checked) {
-            /* add disabled class */
+function checkActivityTimes(activityItems) {
+    let checkedTimesArray = [];
+    let i=0;
+    let eachActivityTime;
+    let isActivityChecked;
+    
+    /* loop through to find checked indexes */
+    for (i=0; i<activityItems.length; i++) {
+        eachActivityTime = activityItems[i].children[2].innerHTML;
+        isActivityChecked = activityItems[i].children[0].checked;
+        if (isActivityChecked) {
+            checkedTimesArray.push(eachActivityTime);
+        }
+    }
+    /* then loop through again to disable unchecked matches 
+       (the double loop seems a bit convoluted, 
+        but I wanted to make sure this worked on DOM refresh
+        and not just on user check/uncheck) */
+    for (i=0; i<activityItems.length; i++) {
+        eachActivityTime = activityItems[i].children[2].innerHTML;
+        isActivityChecked = activityItems[i].children[0].checked;
+        /* if activity is NOT checked and activity time is found in checkedTimesArray */
+        if (!isActivityChecked && checkedTimesArray.includes(eachActivityTime)) {
             activityItems[i].classList.add('disabled');
+            activityItems[i].children[0].setAttribute('disabled', true);
+        } else {
+            activityItems[i].classList.remove('disabled');
+            activityItems[i].children[0].removeAttribute('disabled');
         }
     }
 }
 
+/* add prices of all checked activities and display in DOM */
 function updateActivitiesPrice(activityItems) {
     activitiesTotalPrice = 0;
     for (let i=0; i<activityItems.length; i++) {
@@ -104,6 +127,23 @@ function updateActivitiesPrice(activityItems) {
     activityCostText.textContent = `Total: $${activitiesTotalPrice}`;
 }
 
+/* set focus on activity checkboxes */
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+activateCheckBoxFocus(checkboxes);
+
+function activateCheckBoxFocus(checkboxes) {
+    for (let i=0; i<checkboxes.length; i++) {
+        checkboxes[i].addEventListener('focus', e => {
+            checkboxes[i].parentElement.classList.add('focus');
+        });
+        checkboxes[i].addEventListener('blur', e => {
+            checkboxes[i].parentElement.classList.remove('focus');
+        });
+    }
+}
+
+/* show/hide payment method fields based on user choice */
 let paymentMethod = 'credit-card';
 updatePaymentInfo(paymentMethod);
 
@@ -125,6 +165,7 @@ paymentMethodSelect.addEventListener('change', e => {
     updatePaymentInfo(paymentMethod);
 })
 
+/* validate credit card number, zip code, CVV on blur */
 const ccNum = document.getElementById('cc-num');
 
 ccNum.addEventListener('blur', e => {
@@ -146,32 +187,39 @@ cvv.addEventListener('blur', e => {
 const form = document.querySelector('form');
 
 form.addEventListener('submit', e => {
+    /* assume no errors */
     formHasErrors = false;
+    /* are name, email, activities filled out? */
     validateNameField(nameField, nameField.value);
     validateEmailField(emailField, emailField.value);
     validateActivities(activitiesBox, activitiesTotalPrice);
+    /* if credit card method is chosen, are required fields filled with valid data? */
     if (paymentMethod === 'credit-card') {
         validateCCNum(ccNum, ccNum.value);
         validateZip(zip, zip.value);
         validateCVV(cvv, cvv.value);
     }
+    /* if any of the above throw errors, prevent submission and scroll to top so user notices messaging */
     if (formHasErrors) {
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 })
 
+/* make error msg visible */
 function showError(field, hint) {
     hint.style.display = 'block';
     field.style.border = '1px solid red';
     formHasErrors = true;
 }
 
+/* hide error msg */
 function hideError(field, hint) {
     hint.style.display = 'none';
     field.style.border = '1px solid rgba(36, 28, 21, 0.2)';
 }
 
+/* is name empty? */
 function validateNameField(field, value) {
     const hint = document.getElementById('name-hint');
     if (value.length === 0) {
@@ -181,6 +229,7 @@ function validateNameField(field, value) {
     }
 }
 
+/* is email empty? If not, is the format valid? */
 function validateEmailField(field, value) {
     const hint = document.getElementById('email-hint');
     if (value.length === 0) {
@@ -194,14 +243,17 @@ function validateEmailField(field, value) {
     }
 }
 
+/* make sure email hint contains relevant message */
 function updateEmailHint(msg, hint) {
     hint.textContent = msg;
 }
 
+/* check for appropriate @ and . in email address */
 function isValidEmail(value) {
     return /^[^@]+@[^@.]+\.[a-z]+$/i.test(value);
 }
 
+/* if activities price is zero, user must select an activity */
 function validateActivities(field, value) {
     const hint = document.getElementById('activities-hint');
     if (value === 0) {
@@ -211,6 +263,7 @@ function validateActivities(field, value) {
     }
 }
 
+/* is CC 13-16 digits? */
 function validateCCNum(field, value) {
     const hint = document.getElementById('cc-hint');
     if(!isValidCCNum(value)) {
@@ -224,6 +277,7 @@ function isValidCCNum(value) {
     return /^[0-9]{13,16}$/.test(value);
 }
 
+/* is zip 5 digits? */
 function validateZip(field, value) {
     const hint = document.getElementById('zip-hint');
     if(!isValidZip(value)) {
@@ -237,6 +291,7 @@ function isValidZip(value) {
     return /^[0-9]{5}$/.test(value);
 }
 
+/* is CVV 3 digits? */
 function validateCVV(field, value) {
     const hint = document.getElementById('cvv-hint');
     if(!isValidCVV(value)) {
@@ -247,5 +302,5 @@ function validateCVV(field, value) {
 }
 
 function isValidCVV(value) {
-    return /^[0-9]{5}$/.test(value);
+    return /^[0-9]{3}$/.test(value);
 }
