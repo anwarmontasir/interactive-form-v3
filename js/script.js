@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* validate name field on blur */
-nameField.addEventListener('blur', e => {
+nameField.addEventListener('keyup', e => {
     validateNameField(nameField, e.target.value);
 })
 
@@ -210,7 +210,8 @@ form.addEventListener('submit', e => {
 /* make error msg visible */
 function showError(field, hint) {
     hint.style.display = 'block';
-    field.style.border = '1px solid red';
+    field.parentElement.classList.add('not-valid');
+    field.parentElement.classList.remove('valid');
     if (!formHasErrors) {
         formHasErrors = true;
         errorElement = field.parentElement;
@@ -220,7 +221,8 @@ function showError(field, hint) {
 /* hide error msg */
 function hideError(field, hint) {
     hint.style.display = 'none';
-    field.style.border = '1px solid rgba(36, 28, 21, 0.2)';
+    field.parentElement.classList.remove('not-valid');
+    field.parentElement.classList.add('valid');
 }
 
 /* is name empty? */
