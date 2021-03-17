@@ -32,11 +32,11 @@ Demo at https://anwarmontasir.github.io/interactive-form-v3/.
 
 * If credit card is selected, 
 
-1. Credit card input must contain 13-16 numbers. Validated on blur and submit.
+  * Credit card input must contain 13-16 numbers. Validated on blur and submit.
 
-2. Zip must contain 5 numbers. Validated on blur and submit.
+  * Zip must contain 5 numbers. Validated on blur and submit.
 
-3. CCV must contain 3 numbers. Validated on blur and submit.
+  * CCV must contain 3 numbers. Validated on blur and submit.
 
 ## Accessibility
 
