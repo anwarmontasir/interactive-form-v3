@@ -1,6 +1,3 @@
-/* boolean to test if form is valid */
-let formHasErrors = false;
-
 const nameField = document.getElementById('name');
 
 /* test for DOM load */
@@ -17,7 +14,7 @@ nameField.addEventListener('blur', e => {
 const emailField = document.getElementById('email');
 
 /* validate email field on blur */
-emailField.addEventListener('blur', e => {
+emailField.addEventListener('keyup', e => {
     validateEmailField(emailField, e.target.value);
 })
 
@@ -184,6 +181,10 @@ cvv.addEventListener('blur', e => {
     validateCVV(cvv, e.target.value);
 })
 
+/* boolean to test if form is valid */
+let formHasErrors = false;
+let errorElement;
+
 const form = document.querySelector('form');
 
 form.addEventListener('submit', e => {
@@ -199,10 +200,10 @@ form.addEventListener('submit', e => {
         validateZip(zip, zip.value);
         validateCVV(cvv, cvv.value);
     }
-    /* if any of the above throw errors, prevent submission and scroll to top so user notices messaging */
+    /* if any of the above throw errors, prevent submission and scroll to error field so user notices messaging */
     if (formHasErrors) {
         e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        errorElement.scrollIntoView({behavior: "smooth"});
     }
 })
 
@@ -210,7 +211,10 @@ form.addEventListener('submit', e => {
 function showError(field, hint) {
     hint.style.display = 'block';
     field.style.border = '1px solid red';
-    formHasErrors = true;
+    if (!formHasErrors) {
+        formHasErrors = true;
+        errorElement = field.parentElement;
+    }
 }
 
 /* hide error msg */
